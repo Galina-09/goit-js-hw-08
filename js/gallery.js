@@ -63,3 +63,64 @@ const images = [
     description: 'Lighthouse Coast Sea',
   },
 ];
+
+let instance;
+
+const refs = {
+  gallery: document.querySelector('.gallery'),
+};
+
+refs.gallery.innerHTML = createMarcup(images);
+
+refs.gallery.addEventListener('click', onGalleryClick);
+
+function onGalleryClick(event) {
+  event.preventDefault();
+  if (event.target === event.currentTarget) {
+    return;
+  }
+  const original = event.target.dataset.source;
+  const description = event.target.dataset.description;
+
+  instance = basicLightbox.create(
+    `<div class="modal">
+        <img class="modal-img"
+          src= "${original}"
+          alt="${description}"
+        />
+     </div>`,
+    {
+      onShow: () => {
+        document.addEventListener('keydown', onModalClose);
+      },
+      onClose: () => {
+        document.removeEventListener('keydown', onModalClose);
+      },
+    },
+  );
+  instance.show();
+}
+
+function createMarcup(arr) {
+  return arr
+    .map(
+      ({ preview, original, description }) =>
+        `<li class="gallery-item">
+  <a class="gallery-link" href="${original}">
+    <img
+      class="gallery-image"
+      src="${preview}"
+      data-source="${original}"
+      alt="${description}"
+    />
+  </a>
+</li>`,
+    )
+    .join('');
+}
+
+function onModalClose(event) {
+  if (event.code === 'Escape') {
+    instance.close();
+  }
+}
